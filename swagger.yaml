@@ -1,0 +1,300 @@
+openapi: 3.0.0
+info:
+  title: Song API
+  description: API for managing songs
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /info:
+    get:
+      summary: Get song info
+      parameters:
+        - in: query
+          name: song_name
+          schema:
+            type: string
+          required: true
+          description: Song name to search for
+        - in: query
+          name: group
+          schema:
+            type: string
+          required: true
+          description: Group name to search for
+      responses:
+        200:
+          description: Song info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /fullinfo:
+    get:
+      summary: Get full song info
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Id of song to look for
+      responses:
+        200:
+          description: Full song info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /getInfoByField:
+    get:
+      summary: Get songs by field
+      parameters:
+        - in: query
+          name: field
+          schema:
+            type: string
+          required: true
+          description: Field to filter by
+      responses:
+        200:
+          description: List of songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /getText:
+    get:
+      summary: Get song text
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Song ID
+      responses:
+        200:
+          description: Song text
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Verses'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /delete:
+    delete:
+      summary: Delete song
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Song ID
+      responses:
+        200:
+          description: Song deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /edit:
+    put:
+      summary: Edit song
+      requestBody:
+        description: Song to edit
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongToSend'
+      responses:
+        200:
+          description: Song edited
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+  /add:
+    post:
+      summary: Add song
+      requestBody:
+        description: Song to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongToSend'
+      responses:
+        200:
+          description: Song added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrResponse'
+
+components:
+  schemas:
+    Song:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Song ID
+          example: 1
+        release_date:
+          type: string
+          format: date-time
+          description: Release date of the song
+          example: "2022-01-01T12:00:00Z"
+        text:
+          type: string
+          description: Song text
+          example: "This is a song text"
+        link:
+          type: string
+          description: Song link
+          example: "https://example.com/song-link"
+        song:
+          type: string
+          description: Song title
+          example: "Song Title"
+        group_name:
+          type: string
+          description: Group Name
+          example: "Beatles"
+    SongToSend:
+      type: object
+      properties:
+        release_date:
+          type: string
+          format: date-time
+          description: Release date of the song
+          example: "2022-01-01T12:00:00Z"
+        text:
+          type: string
+          description: Song text
+          example: "This is a song text"
+        link:
+          type: string
+          description: Song link
+          example: "https://example.com/song-link"
+
+    ErrResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Error occurred"
+    Verses:
+      type: object
+      properties:
+        verses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Verse'
+
+    Verse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id of the verse
+        text:
+          type: string
+          description: Verse text
